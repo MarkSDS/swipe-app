@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docenten Paneel</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background: #333; color: white; }
+        input, button { width: 100%; padding: 15px; margin-bottom: 10px; font-size: 1.2rem; }
+        button { background: #3498db; color: white; border: none; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h2>Quiz Control</h2>
+    <input type="text" id="nieuwe-stelling" placeholder="Typ hier de volgende stelling...">
+    <button onclick="stuurNieuweStelling()">Push & Reset Scores</button>
+
+    <script>
+        const WEB_APP_URL = "JOUW_GEKOPIEERDE_URL_HIER"; // Plak hier je URL weer
+
+        function stuurNieuweStelling() {
+            const tekst = document.getElementById('nieuwe-stelling').value;
+            // encodeURIComponent zorgt dat spaties en leestekens goed via een URL verstuurd worden
+            fetch(WEB_APP_URL + "?actie=reset&stelling=" + encodeURIComponent(tekst))
+                .then(() => {
+                    alert("Stelling live gezet en scores gereset!");
+                    document.getElementById('nieuwe-stelling').value = ""; // Maak veld weer leeg
+                });
+        }
+    </script>
+</body>
+</html>
