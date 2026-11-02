@@ -110,13 +110,13 @@
     </div>
 
 <script>
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyDXETYP42iUOqla0EubIqcQ6c_RiOhNnu_Z41QlkMzk_dPIfgJ4BedRjT6yfoHmvV90Q/exec"; 
         // Haal bij het openen van de app direct de actuele stelling op
         fetch(WEB_APP_URL)
             .then(response => response.json())
             .then(data => {
                 document.getElementById('quiz-card').innerText = data.stelling;
             });
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyDXETYP42iUOqla0EubIqcQ6c_RiOhNnu_Z41QlkMzk_dPIfgJ4BedRjT6yfoHmvV90Q/exec"; 
         const card = document.getElementById('quiz-card');
         let startX = 0;
         let currentX = 0;
