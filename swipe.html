@@ -108,19 +108,18 @@
         <p>Kijk naar het scherm voor de uitslag.</p>
     </div>
 
-    <script>
+<script>
+        // PLAK HIER JOUW GOOGLE APPS SCRIPT URL:
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzX7fQ-b5iv021ptIbLb6mG70NVDoJKgu1-PqcSnSeaFPTqh3UfB8ibqB9pwgdisUelpQ/exec"; 
         const card = document.getElementById('quiz-card');
         let startX = 0;
         let currentX = 0;
         let isDragging = false;
 
-        // --- Touch en Muis events voor de swipe animatie ---
         card.addEventListener('touchstart', dragStart);
         card.addEventListener('mousedown', dragStart);
-
         document.addEventListener('touchmove', dragMove);
         document.addEventListener('mousemove', dragMove);
-
         document.addEventListener('touchend', dragEnd);
         document.addEventListener('mouseup', dragEnd);
 
@@ -134,7 +133,6 @@
             if (!isDragging) return;
             const x = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
             currentX = x - startX;
-            // Roteer de kaart een beetje tijdens het swipen voor het 'Tinder' effect
             const rotate = currentX * 0.05;
             card.style.transform = `translateX(${currentX}px) rotate(${rotate}deg)`;
         }
@@ -143,35 +141,29 @@
             if (!isDragging) return;
             isDragging = false;
             card.classList.remove('dragging');
-
-            const swipeThreshold = 100; // Hoe ver moet je swipen voor een keuze?
+            const swipeThreshold = 100; 
 
             if (currentX > swipeThreshold) {
-                // Swipe Rechts (JA)
                 card.style.transform = `translateX(1000px) rotate(30deg)`;
                 setTimeout(() => verwerkKeuze('ja'), 300);
             } else if (currentX < -swipeThreshold) {
-                // Swipe Links (NEE)
                 card.style.transform = `translateX(-1000px) rotate(-30deg)`;
                 setTimeout(() => verwerkKeuze('nee'), 300);
             } else {
-                // Terugveren naar het midden als je niet ver genoeg swipet
                 card.style.transform = `translateX(0px) rotate(0deg)`;
             }
             currentX = 0;
         }
 
-        // --- Functie die wordt aangeroepen na een swipe of knopdruk ---
         function verwerkKeuze(keuze) {
-            console.log("Stem geregistreerd: " + keuze);
-            
-            // Verberg de kaart en knoppen, toon bedankt-scherm
             document.getElementById('header').style.display = 'none';
             document.getElementById('card-container').style.display = 'none';
             document.getElementById('btn-container').style.display = 'none';
             document.getElementById('bedankt-scherm').style.display = 'flex';
 
-            // HIER KOMT STRAKS DE CODE OM DE STEM NAAR DE DATABASE TE STUREN
+            // Stuur de stem naar Google Sheets
+            fetch(WEB_APP_URL + "?actie=stem&keuze=" + keuze)
+                .catch(error => console.error("Fout bij versturen:", error));
         }
     </script>
 </body>
