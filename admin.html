@@ -6,7 +6,8 @@
     <style>
         body { font-family: sans-serif; padding: 20px; background: #333; color: white; }
         input, button { width: 100%; padding: 15px; margin-bottom: 10px; font-size: 1.2rem; }
-        button { background: #3498db; color: white; border: none; border-radius: 5px; }
+        button { background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background: #2980b9; }
     </style>
 </head>
 <body>
@@ -15,15 +16,24 @@
     <button onclick="stuurNieuweStelling()">Push & Reset Scores</button>
 
     <script>
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyDXETYP42iUOqla0EubIqcQ6c_RiOhNnu_Z41QlkMzk_dPIfgJ4BedRjT6yfoHmvV90Q/exec"; // Plak hier je URL weer
+        // Let op de aanhalingstekens " " rondom je link!
+        const WEB_APP_URL =  "https://script.google.com/macros/s/AKfycbyDXETYP42iUOqla0EubIqcQ6c_RiOhNnu_Z41QlkMzk_dPIfgJ4BedRjT6yfoHmvV90Q/exec"; 
+
         function stuurNieuweStelling() {
             const tekst = document.getElementById('nieuwe-stelling').value;
-            // encodeURIComponent zorgt dat spaties en leestekens goed via een URL verstuurd worden
+            
+            // Controleer of de docent wel iets heeft ingetypt
+            if(tekst.trim() === "") {
+                alert("Typ eerst een stelling in!");
+                return;
+            }
+
             fetch(WEB_APP_URL + "?actie=reset&stelling=" + encodeURIComponent(tekst))
                 .then(() => {
-                    //alert("Stelling live gezet en scores gereset!");
-                    document.getElementById('nieuwe-stelling').value = ""; // Maak veld weer leeg
-                });
+                    alert("Stelling is geladen en scores staan op 0!");
+                    document.getElementById('nieuwe-stelling').value = ""; 
+                })
+                .catch(error => alert("Oeps, er ging iets mis: " + error));
         }
     </script>
 </body>
