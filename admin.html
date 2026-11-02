@@ -4,37 +4,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Docenten Paneel</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; background: #333; color: white; }
-        input, button { width: 100%; padding: 15px; margin-bottom: 10px; font-size: 1.2rem; }
-        button { background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        body { font-family: sans-serif; padding: 20px; background: #333; color: white; text-align: center; }
+        button { width: 100%; padding: 15px; margin-bottom: 15px; font-size: 1.2rem; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer; }
         button:hover { background: #2980b9; }
+        .nav-btn { background: #2ecc71; }
+        .danger { background: #e74c3c; margin-top: 30px; }
+        #huidige-stelling { background: #2c3e50; padding: 20px; border-radius: 5px; margin-bottom: 25px; font-size: 1.1rem; font-weight: bold; min-height: 40px; }
     </style>
 </head>
 <body>
     <h2>Quiz Control</h2>
-    <input type="text" id="nieuwe-stelling" placeholder="Typ hier de volgende stelling...">
-    <button onclick="stuurNieuweStelling()">Push & Reset Scores</button>
+    <div id="huidige-stelling">Verbinden met Google Sheet...</div>
+
+    <button class="nav-btn" onclick="stuurActie('volgende')">Volgende Stelling ➡️</button>
+    <button onclick="stuurActie('vorige')">⬅️ Vorige</button>
+    
+    <button class="danger" onclick="stuurActie('reset_naar_start')">🔄 Terug naar Vraag 1</button>
 
     <script>
-        // Let op de aanhalingstekens " " rondom je link!
-        const WEB_APP_URL =  "https://script.google.com/macros/s/AKfycbyDXETYP42iUOqla0EubIqcQ6c_RiOhNnu_Z41QlkMzk_dPIfgJ4BedRjT6yfoHmvV90Q/exec"; 
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyDXETYP42iUOqla0EubIqcQ6c_RiOhNnu_Z41QlkMzk_dPIfgJ4BedRjT6yfoHmvV90Q/exec"; 
 
-        function stuurNieuweStelling() {
-            const tekst = document.getElementById('nieuwe-stelling').value;
+        function stuurActie(actie) {
+            document.getElementById('huidige-stelling').innerText = "Laden...";
             
-            // Controleer of de docent wel iets heeft ingetypt
-            if(tekst.trim() === "") {
-                alert("Typ eerst een stelling in!");
-                return;
-            }
-
-            fetch(WEB_APP_URL + "?actie=reset&stelling=" + encodeURIComponent(tekst))
-                .then(() => {
-                    alert("Stelling is geladen en scores staan op 0!");
-                    document.getElementById('nieuwe-stelling').value = ""; 
+            fetch(WEB_APP_URL + "?actie=" + actie)
+                .then(response => response.json())
+                .then(data => {
+                    // Update het docentenscherm zodat je ziet wat er op het digibord staat
+                    document.getElementById('huidige-stelling').innerText = 
+                        "Rij " + data.rij + ": " + data.stelling;
                 })
-                .catch(error => alert("Oeps, er ging iets mis: " + error));
+                .catch(error => alert("Oeps, fout: " + error));
         }
+
+        // Haal direct bij het openen van de admin-pagina de actuele vraag op
+        stuurActie('status');
     </script>
 </body>
 </html>
