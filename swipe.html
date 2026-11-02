@@ -92,7 +92,7 @@
     <div class="card-container" id="card-container">
         <!-- De Swipe Kaart -->
         <div class="card" id="quiz-card">
-            Massief hout is altijd de beste keuze voor kastconstructies.
+            Laden...
         </div>
     </div>
 
@@ -104,12 +104,18 @@
 
     <!-- Scherm na het stemmen -->
     <div id="bedankt-scherm">
-        <h2>Keuze geregistreerd!</h2>
-        <p>Kijk naar het scherm voor de uitslag.</p>
+        <h2>Catched!</h2>
+        <p>Zie scherm voor scores</p>
+        <button class="swipe-btn" style="background-color: #3498db; margin-top: 30px;" onclick="window.location.reload()">Naar de volgende stelling</button>
     </div>
 
 <script>
-        // PLAK HIER JOUW GOOGLE APPS SCRIPT URL:
+        // Haal bij het openen van de app direct de actuele stelling op
+        fetch(WEB_APP_URL)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('quiz-card').innerText = data.stelling;
+            });
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzX7fQ-b5iv021ptIbLb6mG70NVDoJKgu1-PqcSnSeaFPTqh3UfB8ibqB9pwgdisUelpQ/exec"; 
         const card = document.getElementById('quiz-card');
         let startX = 0;
