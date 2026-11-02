@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Quiz Swipe</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #ecf0f1;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            touch-action: none; /* Voorkomt scrollen tijdens swipen */
+        }
+        .header {
+            margin-top: 30px;
+            text-align: center;
+            color: #2c3e50;
+        }
+        .card-container {
+            position: relative;
+            width: 85vw;
+            max-width: 400px;
+            height: 60vh;
+            margin-top: 40px;
+        }
+        .card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #34495e;
+            user-select: none;
+            transition: transform 0.3s ease; /* Soepele terugkeer */
+            cursor: grab;
+        }
+        .card.dragging {
+            transition: none; /* Geen vertraging tijdens het slepen met de vinger */
+            cursor: grabbing;
+        }
+        #bedankt-scherm {
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            color: #2c3e50;
+        }
+        .btn-container {
+            display: flex;
+            width: 100%;
+            justify-content: space-between;
+            padding: 0 10vw;
+            margin-top: 20px;
+            box-sizing: border-box;
+            max-width: 500px;
+        }
+        .swipe-btn {
+            padding: 15px 30px;
+            border-radius: 30px;
+            border: none;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: white;
+        }
+        .btn-nee { background-color: #e74c3c; }
+        .btn-ja { background-color: #2ecc71; }
+    </style>
+</head>
+<body>
+
+    <div class="header" id="header">
+        <h2>Wat vind jij?</h2>
+        <p>Swipe <b style="color:#e74c3c">Links (Nee)</b> of <b style="color:#2ecc71">Rechts (Ja)</b></p>
+    </div>
+
+    <div class="card-container" id="card-container">
+        <!-- De Swipe Kaart -->
+        <div class="card" id="quiz-card">
+            Massief hout is altijd de beste keuze voor kastconstructies.
+        </div>
+    </div>
+
+    <!-- Knoppen als alternatief voor swipen -->
+    <div class="btn-container" id="btn-container">
+        <button class="swipe-btn btn-nee" onclick="verwerkKeuze('nee')">NEE</button>
+        <button class="swipe-btn btn-ja" onclick="verwerkKeuze('ja')">JA</button>
+    </div>
+
+    <!-- Scherm na het stemmen -->
+    <div id="bedankt-scherm">
+        <h2>Keuze geregistreerd!</h2>
+        <p>Kijk naar het scherm voor de uitslag.</p>
+    </div>
+
+    <script>
+        const card = document.getElementById('quiz-card');
+        let startX = 0;
+        let currentX = 0;
+        let isDragging = false;
+
+        // --- Touch en Muis events voor de swipe animatie ---
+        card.addEventListener('touchstart', dragStart);
+        card.addEventListener('mousedown', dragStart);
+
+        document.addEventListener('touchmove', dragMove);
+        document.addEventListener('mousemove', dragMove);
+
+        document.addEventListener('touchend', dragEnd);
+        document.addEventListener('mouseup', dragEnd);
+
+        function dragStart(e) {
+            isDragging = true;
+            card.classList.add('dragging');
+            startX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
+        }
+
+        function dragMove(e) {
+            if (!isDragging) return;
+            const x = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX;
+            currentX = x - startX;
+            // Roteer de kaart een beetje tijdens het swipen voor het 'Tinder' effect
+            const rotate = currentX * 0.05;
+            card.style.transform = `translateX(${currentX}px) rotate(${rotate}deg)`;
+        }
+
+        function dragEnd() {
+            if (!isDragging) return;
+            isDragging = false;
+            card.classList.remove('dragging');
+
+            const swipeThreshold = 100; // Hoe ver moet je swipen voor een keuze?
+
+            if (currentX > swipeThreshold) {
+                // Swipe Rechts (JA)
+                card.style.transform = `translateX(1000px) rotate(30deg)`;
+                setTimeout(() => verwerkKeuze('ja'), 300);
+            } else if (currentX < -swipeThreshold) {
+                // Swipe Links (NEE)
+                card.style.transform = `translateX(-1000px) rotate(-30deg)`;
+                setTimeout(() => verwerkKeuze('nee'), 300);
+            } else {
+                // Terugveren naar het midden als je niet ver genoeg swipet
+                card.style.transform = `translateX(0px) rotate(0deg)`;
+            }
+            currentX = 0;
+        }
+
+        // --- Functie die wordt aangeroepen na een swipe of knopdruk ---
+        function verwerkKeuze(keuze) {
+            console.log("Stem geregistreerd: " + keuze);
+            
+            // Verberg de kaart en knoppen, toon bedankt-scherm
+            document.getElementById('header').style.display = 'none';
+            document.getElementById('card-container').style.display = 'none';
+            document.getElementById('btn-container').style.display = 'none';
+            document.getElementById('bedankt-scherm').style.display = 'flex';
+
+            // HIER KOMT STRAKS DE CODE OM DE STEM NAAR DE DATABASE TE STUREN
+        }
+    </script>
+</body>
+</html>
