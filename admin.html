@@ -21,7 +21,7 @@
             // encodeURIComponent zorgt dat spaties en leestekens goed via een URL verstuurd worden
             fetch(WEB_APP_URL + "?actie=reset&stelling=" + encodeURIComponent(tekst))
                 .then(() => {
-                    alert("Stelling live gezet en scores gereset!");
+                    //alert("Stelling live gezet en scores gereset!");
                     document.getElementById('nieuwe-stelling').value = ""; // Maak veld weer leeg
                 });
         }
