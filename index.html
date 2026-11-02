@@ -106,16 +106,25 @@
         </div>
     </div>
 
-    <script>
-        // Placeholder functie om te testen of het updaten visueel werkt.
-        // In de volgende stap vervangen we dit door een live fetch() naar de database.
-        function testScores() {
-            document.getElementById('score-ja').innerText = 18;
-            document.getElementById('score-nee').innerText = 5;
+<script>
+        // PLAK HIER DIEZELFDE GOOGLE APPS SCRIPT URL:
+        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbzX7fQ-b5iv021ptIbLb6mG70NVDoJKgu1-PqcSnSeaFPTqh3UfB8ibqB9pwgdisUelpQ/exec"; 
+        function haalScoresOp() {
+            // Omdat we geen actie=stem meesturen, geeft het script alleen de standen terug
+            fetch(WEB_APP_URL)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('score-ja').innerText = data.ja;
+                    document.getElementById('score-nee').innerText = data.nee;
+                })
+                .catch(error => console.error("Fout bij ophalen:", error));
         }
         
-        // Simuleer inkomende stemmen na 2 seconden
-        setTimeout(testScores, 2000);
+        // Haal direct bij het openen de stand op
+        haalScoresOp();
+        
+        // Ververs de uitslag elke 2 seconden voor het 'live' effect
+        setInterval(haalScoresOp, 2000);
     </script>
 </body>
 </html>
