@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Live Quiz Scherm</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #2c3e50;
+            color: white;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+        .left-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 50px;
+            text-align: center;
+            background-color: #34495e;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.3);
+            z-index: 10;
+        }
+        .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #2c3e50;
+        }
+        h1 { 
+            font-size: 3.5vw; 
+            margin-bottom: 10px; 
+            line-height: 1.2;
+        }
+        .instructie {
+            font-size: 1.5vw;
+            color: #bdc3c7;
+            margin-bottom: 30px;
+        }
+        .qr-placeholder {
+            width: 30vw;
+            max-width: 300px;
+            height: 30vw;
+            max-height: 300px;
+            background-color: white;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            border-radius: 15px;
+            border: 10px solid white;
+        }
+        .scores {
+            display: flex;
+            gap: 10%;
+            width: 100%;
+            justify-content: center;
+        }
+        .score-box {
+            text-align: center;
+            width: 40%;
+        }
+        .score-title { 
+            font-size: 3vw; 
+            font-weight: bold; 
+            margin-bottom: -10px; 
+        }
+        .score-value { 
+            font-size: 15vw; 
+            font-weight: bold; 
+        }
+        .ja-kleur { color: #2ecc71; }
+        .nee-kleur { color: #e74c3c; }
+    </style>
+</head>
+<body>
+    <div class="left-panel">
+        <h1>Stelling: Massief hout is altijd de beste keuze voor kastconstructies.</h1>
+        <p class="instructie">Scan de QR-code met je telefoon om te stemmen (Swipe Links of Rechts)</p>
+        
+        <!-- Hier plaats je later een echte <img> tag naar je gegenereerde QR code -->
+        <div class="qr-placeholder">
+            [ QR CODE ]
+        </div>
+    </div>
+    
+    <div class="right-panel">
+        <div class="scores">
+            <div class="score-box ja-kleur">
+                <div class="score-title">JA</div>
+                <!-- ID's zijn belangrijk voor het JavaScript straks -->
+                <div class="score-value" id="score-ja">0</div>
+            </div>
+            <div class="score-box nee-kleur">
+                <div class="score-title">NEE</div>
+                <div class="score-value" id="score-nee">0</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Placeholder functie om te testen of het updaten visueel werkt.
+        // In de volgende stap vervangen we dit door een live fetch() naar de database.
+        function testScores() {
+            document.getElementById('score-ja').innerText = 18;
+            document.getElementById('score-nee').innerText = 5;
+        }
+        
+        // Simuleer inkomende stemmen na 2 seconden
+        setTimeout(testScores, 2000);
+    </script>
+</body>
+</html>
