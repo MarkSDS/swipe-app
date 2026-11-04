@@ -57,22 +57,28 @@
         let actueleRij = 0; 
 
         fetch(WEB_APP_URL)
-            .then(response => response.json())
-            .then(data => {
-                actueleRij = data.rij; 
-                const laatstGestemd = localStorage.getItem('laatstGestemdeRij'); 
-
-                if (laatstGestemd == actueleRij) {
-                    verbergQuiz();
-                    document.getElementById('wacht-scherm').style.display = 'flex';
-                } else {
-                    document.getElementById('quiz-card').innerText = data.stelling;
-                }
-            })
-            .catch(error => {
-                document.getElementById('quiz-card').innerText = "Fout: Controleer URL of F1";
-                console.error(error);
-            });
+                    .then(response => response.json())
+                    .then(data => {
+                        actueleRij = data.rij; 
+                        let laatstGestemd = localStorage.getItem('laatstGestemdeRij'); 
+        
+                        // DE NIEUWE TRUC: Als alle scores 0 zijn, heeft de docent gereset!
+                        if (data.ja === 0 && data.nee === 0 && data.pas === 0) {
+                            localStorage.removeItem('laatstGestemdeRij');
+                            laatstGestemd = null; // Geheugen is nu leeg
+                        }
+        
+                        if (laatstGestemd == actueleRij) {
+                            verbergQuiz();
+                            document.getElementById('wacht-scherm').style.display = 'flex';
+                        } else {
+                            document.getElementById('quiz-card').innerText = data.stelling;
+                        }
+                    })
+                    .catch(error => {
+                        document.getElementById('quiz-card').innerText = "Fout bij ophalen stelling.";
+                        console.error(error);
+                    });
 
         // Swipe Logica (Nu met Y-as)
         const card = document.getElementById('quiz-card');
