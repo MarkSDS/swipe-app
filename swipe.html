@@ -7,23 +7,25 @@
     <style>
         body { margin: 0; padding: 0; background-color: #ecf0f1; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; display: flex; flex-direction: column; align-items: center; height: 100vh; overflow: hidden; touch-action: none; }
         .header { margin-top: 30px; text-align: center; color: #2c3e50; }
-        .card-container { position: relative; width: 85vw; max-width: 400px; height: 60vh; margin-top: 40px; }
-        .card { position: absolute; width: 100%; height: 100%; background-color: white; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); display: flex; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box; font-size: 1.5rem; font-weight: bold; color: #34495e; user-select: none; transition: transform 0.3s ease; cursor: grab; }
+        .card-container { position: relative; width: 85vw; max-width: 400px; height: 50vh; margin-top: 20px; }
+        .card { position: absolute; width: 100%; height: 100%; background-color: white; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); display: flex; justify-content: center; align-items: center; text-align: center; padding: 20px; box-sizing: border-box; font-size: 1.5rem; font-weight: bold; color: #34495e; user-select: none; transition: transform 0.3s ease; cursor: grab; z-index: 10; }
         .card.dragging { transition: none; cursor: grabbing; }
-        .btn-container { display: flex; width: 100%; justify-content: space-between; padding: 0 10vw; margin-top: 20px; box-sizing: border-box; max-width: 500px; }
-        .swipe-btn { padding: 15px 30px; border-radius: 30px; border: none; font-size: 1.2rem; font-weight: bold; color: white; cursor: pointer;}
+        
+        .btn-container { display: flex; width: 100%; justify-content: space-between; padding: 0 5vw; margin-top: 20px; box-sizing: border-box; max-width: 500px; gap: 10px; }
+        .swipe-btn { flex: 1; padding: 15px 0; border-radius: 15px; border: none; font-size: 1.1rem; font-weight: bold; color: white; cursor: pointer;}
         .btn-nee { background-color: #e74c3c; }
+        .btn-pas { background-color: #f39c12; }
         .btn-ja { background-color: #2ecc71; }
         
-        /* Verborgen schermen */
         #bedankt-scherm, #wacht-scherm { display: none; flex-direction: column; justify-content: center; align-items: center; height: 100%; color: #2c3e50; text-align: center; padding: 20px; }
+        .ververs-btn { padding: 15px 30px; border-radius: 30px; border: none; font-size: 1.2rem; font-weight: bold; color: white; cursor: pointer; }
     </style>
 </head>
 <body>
 
     <div class="header" id="header">
         <h2>Wat vind jij?</h2>
-        <p>Swipe <b style="color:#e74c3c">Links (Nee)</b> of <b style="color:#2ecc71">Rechts (Ja)</b></p>
+        <p><b style="color:#e74c3c">Links (Nee)</b>, <b style="color:#f39c12">Omhoog (Pas)</b> of <b style="color:#2ecc71">Rechts (Ja)</b></p>
     </div>
 
     <div class="card-container" id="card-container">
@@ -32,63 +34,92 @@
 
     <div class="btn-container" id="btn-container">
         <button class="swipe-btn btn-nee" onclick="verwerkKeuze('nee')">NEE</button>
+        <button class="swipe-btn btn-pas" onclick="verwerkKeuze('pas')">PAS</button>
         <button class="swipe-btn btn-ja" onclick="verwerkKeuze('ja')">JA</button>
     </div>
 
-    <!-- Scherm direct na het stemmen -->
     <div id="bedankt-scherm">
         <h2>Keuze geregistreerd!</h2>
         <p>Kijk naar het scherm voor de uitslag.</p>
-        <button class="swipe-btn" style="background-color: #3498db; margin-top: 30px;" onclick="window.location.reload()">Ververs voor de volgende stelling</button>
+        <button class="ververs-btn" style="background-color: #3498db; margin-top: 30px;" onclick="window.location.reload()">Ververs voor de volgende stelling</button>
     </div>
 
-    <!-- Scherm als de docent nog niet naar de volgende stelling is gegaan -->
     <div id="wacht-scherm">
         <h2>Even geduld... ⏳</h2>
         <p>De docent heeft de volgende stelling nog niet klaargezet.</p>
-        <button class="swipe-btn" style="background-color: #f39c12; margin-top: 30px;" onclick="window.location.reload()">Check opnieuw 🔄</button>
+        <button class="ververs-btn" style="background-color: #f39c12; margin-top: 30px;" onclick="window.location.reload()">Check opnieuw 🔄</button>
     </div>
 
     <script>
         // PLAK HIER JOUW URL:
-        const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyDXETYP42iUOqla0EubIqcQ6c_RiOhNnu_Z41QlkMzk_dPIfgJ4BedRjT6yfoHmvV90Q/exec"; 
+        const WEB_APP_URL = "JOUW_URL_HIER"; 
 
-        let actueleRij = 0; // Deze onthoudt welke vraag er nu voor staat
+        let actueleRij = 0; 
 
-        // 1. Bij het laden: Check de Google Sheet EN het geheugen van de telefoon
         fetch(WEB_APP_URL)
             .then(response => response.json())
             .then(data => {
-                actueleRij = data.rij; // Welke rij geeft Google door?
-                const laatstGestemd = localStorage.getItem('laatstGestemdeRij'); // Wat herinnert de telefoon zich?
+                actueleRij = data.rij; 
+                const laatstGestemd = localStorage.getItem('laatstGestemdeRij'); 
 
                 if (laatstGestemd == actueleRij) {
-                    // De student is te snel en heeft deze stelling al beantwoord!
                     verbergQuiz();
                     document.getElementById('wacht-scherm').style.display = 'flex';
                 } else {
-                    // Er is een nieuwe stelling, toon de kaart
                     document.getElementById('quiz-card').innerText = data.stelling;
                 }
+            })
+            .catch(error => {
+                document.getElementById('quiz-card').innerText = "Fout: Controleer URL of F1";
+                console.error(error);
             });
 
-        // 2. Swipe Logica
+        // Swipe Logica (Nu met Y-as)
         const card = document.getElementById('quiz-card');
-        let startX = 0, currentX = 0, isDragging = false;
+        let startX = 0, currentX = 0, startY = 0, currentY = 0, isDragging = false;
 
         card.addEventListener('touchstart', dragStart); card.addEventListener('mousedown', dragStart);
         document.addEventListener('touchmove', dragMove); document.addEventListener('mousemove', dragMove);
         document.addEventListener('touchend', dragEnd); document.addEventListener('mouseup', dragEnd);
 
-        function dragStart(e) { isDragging = true; card.classList.add('dragging'); startX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX; }
-        function dragMove(e) { if (!isDragging) return; currentX = (e.type.includes('mouse') ? e.pageX : e.touches[0].clientX) - startX; card.style.transform = `translateX(${currentX}px) rotate(${currentX * 0.05}deg)`; }
+        function dragStart(e) { 
+            isDragging = true; card.classList.add('dragging'); 
+            startX = e.type.includes('mouse') ? e.pageX : e.touches[0].clientX; 
+            startY = e.type.includes('mouse') ? e.pageY : e.touches[0].clientY; 
+        }
+        
+        function dragMove(e) { 
+            if (!isDragging) return; 
+            currentX = (e.type.includes('mouse') ? e.pageX : e.touches[0].clientX) - startX; 
+            currentY = (e.type.includes('mouse') ? e.pageY : e.touches[0].clientY) - startY; 
+            // Beweeg de kaart zowel horizontaal als verticaal onder de vinger
+            card.style.transform = `translate(${currentX}px, ${currentY}px) rotate(${currentX * 0.05}deg)`; 
+        }
+        
         function dragEnd() {
             if (!isDragging) return;
             isDragging = false; card.classList.remove('dragging');
-            if (currentX > 100) { card.style.transform = `translateX(1000px) rotate(30deg)`; setTimeout(() => verwerkKeuze('ja'), 300); } 
-            else if (currentX < -100) { card.style.transform = `translateX(-1000px) rotate(-30deg)`; setTimeout(() => verwerkKeuze('nee'), 300); } 
-            else { card.style.transform = `translateX(0px) rotate(0deg)`; }
-            currentX = 0;
+            
+            const threshold = 100;
+
+            // Check eerst voor OMHOOG: Y moet negatief zijn (omhoog) én de verticale beweging moet groter zijn dan de horizontale
+            if (currentY < -threshold && Math.abs(currentY) > Math.abs(currentX)) { 
+                card.style.transform = `translate(${currentX}px, -1000px) rotate(${currentX * 0.05}deg)`; 
+                setTimeout(() => verwerkKeuze('pas'), 300); 
+            } 
+            else if (currentX > threshold) { 
+                card.style.transform = `translate(1000px, ${currentY}px) rotate(30deg)`; 
+                setTimeout(() => verwerkKeuze('ja'), 300); 
+            } 
+            else if (currentX < -threshold) { 
+                card.style.transform = `translate(-1000px, ${currentY}px) rotate(-30deg)`; 
+                setTimeout(() => verwerkKeuze('nee'), 300); 
+            } 
+            else { 
+                // Terugveren naar het midden
+                card.style.transform = `translate(0px, 0px) rotate(0deg)`; 
+            }
+            currentX = 0; currentY = 0;
         }
 
         function verbergQuiz() {
@@ -97,15 +128,11 @@
             document.getElementById('btn-container').style.display = 'none';
         }
 
-        // 3. De stem verwerken en in het geheugen opslaan
         function verwerkKeuze(keuze) {
             verbergQuiz();
             document.getElementById('bedankt-scherm').style.display = 'flex';
-
-            // SLA DE HUIDIGE RIJ OP IN HET LOKALE GEHEUGEN VAN DE TELEFOON
             localStorage.setItem('laatstGestemdeRij', actueleRij);
 
-            // Stuur door naar Google
             fetch(WEB_APP_URL + "?actie=stem&keuze=" + keuze)
                 .catch(error => console.error("Fout bij versturen:", error));
         }
