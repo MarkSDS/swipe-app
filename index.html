@@ -93,15 +93,18 @@
     </div>
     
     <div class="right-panel">
-        <div class="scores">
-            <div class="score-box ja-kleur">
-                <div class="score-title">JA</div>
-                <!-- ID's zijn belangrijk voor het JavaScript straks -->
-                <div class="score-value" id="score-ja">0</div>
+        <div class="scores" style="display: flex; gap: 5%; width: 100%; justify-content: center;">
+            <div class="score-box nee-kleur" style="width: 30%; text-align: center;">
+                <div class="score-title" style="font-size: 3vw; font-weight: bold;">NEE</div>
+                <div class="score-value" id="score-nee" style="font-size: 10vw; font-weight: bold;">0</div>
             </div>
-            <div class="score-box nee-kleur">
-                <div class="score-title">NEE</div>
-                <div class="score-value" id="score-nee">0</div>
+            <div class="score-box" style="width: 30%; text-align: center; color: #f39c12;">
+                <div class="score-title" style="font-size: 3vw; font-weight: bold;">PAS</div>
+                <div class="score-value" id="score-pas" style="font-size: 10vw; font-weight: bold;">0</div>
+            </div>
+            <div class="score-box ja-kleur" style="width: 30%; text-align: center;">
+                <div class="score-title" style="font-size: 3vw; font-weight: bold;">JA</div>
+                <div class="score-value" id="score-ja" style="font-size: 10vw; font-weight: bold;">0</div>
             </div>
         </div>
     </div>
@@ -116,6 +119,7 @@
                 .then(data => {
                     document.getElementById('score-ja').innerText = data.ja;
                     document.getElementById('score-nee').innerText = data.nee;
+                    document.getElementById('score-pas').innerText = data.pas;
                     document.getElementById('stelling-tekst').innerText = data.stelling;
                 })
                 .catch(error => console.error("Fout bij ophalen:", error));
