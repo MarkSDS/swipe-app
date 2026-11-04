@@ -50,7 +50,7 @@
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('huidige-stelling').innerText = 
-                        "Rij " + data.rij + ": " + data.stelling;
+                        data.stelling; // "Rij " + data.rij + ": " + 
                     document.getElementById('volgende-tekst').innerText = 
                         data.volgendeStelling ? data.volgendeStelling : "Einde van de lijst bereikt!";
                 })
