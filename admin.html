@@ -7,7 +7,9 @@
         body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; padding: 20px; background: #2c3e50; color: white; display: flex; flex-direction: column; align-items: center; margin: 0; }
         .container { width: 100%; max-width: 500px; display: flex; flex-direction: column; align-items: center; }
         
-        #huidige-stelling { background: #34495e; padding: 20px; border-radius: 12px; margin-bottom: 15px; font-size: 1.1rem; font-weight: bold; width: 100%; box-sizing: border-box; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        #huidige-stelling { background: #34495e; padding: 20px; border-radius: 12px; margin-bottom: 10px; font-size: 1.1rem; font-weight: bold; width: 100%; box-sizing: border-box; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        #totaal-teller { background: #e67e22; color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+        
         #volgende-preview { background: #1a252f; padding: 15px; border-radius: 12px; margin-bottom: 30px; font-size: 0.9rem; color: #bdc3c7; font-style: italic; width: 100%; box-sizing: border-box; text-align: center; }
         
         .nav-buttons { display: flex; gap: 15px; width: 100%; justify-content: center; margin-bottom: 30px; }
@@ -26,12 +28,13 @@
 </head>
 <body>
     <div class="container">
-        <h2 style="margin-bottom: 30px;">Quiz Control</h2>
+        <h2 style="margin-bottom: 20px;">Quiz Control</h2>
         
         <div id="huidige-stelling">Verbinden met Google Sheet...</div>
+        <div id="totaal-teller">Stemmen worden geladen...</div>
+        
         <div id="volgende-preview">Volgende: <span id="volgende-tekst">...</span></div>
 
-        <!-- Knoppen naast elkaar in een flex-container -->
         <div class="nav-buttons">
             <button class="vorige-btn" onclick="stuurActie('vorige')">⬅️ Vorige</button>
             <button class="nav-btn" onclick="stuurActie('volgende')">Volgende ➡️</button>
@@ -41,23 +44,36 @@
     </div>
 
     <script>
+        // Jouw URL staat er nu netjes hard in
         const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbyDXETYP42iUOqla0EubIqcQ6c_RiOhNnu_Z41QlkMzk_dPIfgJ4BedRjT6yfoHmvV90Q/exec";
 
         function stuurActie(actie) {
-            document.getElementById('huidige-stelling').innerText = "Laden...";
+            if(actie !== 'status') {
+                document.getElementById('huidige-stelling').innerText = "Laden...";
+            }
             
             fetch(WEB_APP_URL + "?actie=" + actie)
                 .then(response => response.json())
                 .then(data => {
                     document.getElementById('huidige-stelling').innerText = 
-                        data.stelling; // "Rij " + data.rij + ": " + 
+                        "Rij " + data.rij + ": " + data.stelling;
+                    
+                    // Hier injecteren we de tekst uit jouw formule (Kolom E)
+                    document.getElementById('totaal-teller').innerText = data.totaal;
+                        
                     document.getElementById('volgende-tekst').innerText = 
                         data.volgendeStelling ? data.volgendeStelling : "Einde van de lijst bereikt!";
                 })
-                .catch(error => alert("Oeps, fout: " + error));
+                .catch(error => console.error("Oeps, fout: " + error));
         }
 
+        // Haal direct bij openen de status op
         stuurActie('status');
+        
+        // Ververs de status (en dus de teller) elke 3 seconden op de achtergrond
+        setInterval(() => {
+            stuurActie('status');
+        }, 3000);
     </script>
 </body>
 </html>
